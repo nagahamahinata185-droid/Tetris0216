@@ -17,7 +17,7 @@ from terminal_io import Terminal, paint
 
 COLS, ROWS = 10, 18
 # 4x4以内の相対座標。T/J/L/S/Z/I/Oの7種類。
-#変更点02 一つのマスを埋めれるぶろっくの追加
+#変更点02,03 一つのマスを埋めれるぶろっくの追加
 SHAPES = {
     'I': [(0, 1), (1, 1), (2, 1), (3, 1)],
     'O': [(1, 0), (2, 0), (1, 1), (2, 1)],
@@ -27,6 +27,7 @@ SHAPES = {
     'J': [(0, 0), (0, 1), (1, 1), (2, 1)],
     'L': [(2, 0), (0, 1), (1, 1), (2, 1)],
     'DOT': [(1, 1)],
+    'BOMB': [(1, 1)],
 }
 
 
@@ -92,15 +93,24 @@ class Tetris:
             self.score += 1
         self.lock()
 
+   
+   #変更点03 爆弾ブロックの追加
     def lock(self):
-        for dx, dy in self.cells:
-            px, py = self.x + dx, self.y + dy
-            if py < 0:
-                self.game_over = True
-                return
-            self.board[py][px] = self.kind
-        self.clear_lines()
-        self.spawn()
+            for dx, dy in self.cells:
+                px, py = self.x + dx, self.y + dy
+                if py < 0:
+                    self.game_over = True
+                    return
+                self.board[py][px] = self.kind
+
+                if self.kind == 'BOMB':
+                    for by in range(py - 1, py + 2):
+                        for bx in range(px - 1, px + 2):
+                            if 0 <= by < ROWS and 0 <= bx < COLS:
+                                self.board[by][bx] = ' '
+
+            self.clear_lines()
+            self.spawn()
     #変更点01 全消ししたらボーナス機能
     def clear_lines(self):
             remaining = [row for row in self.board if ' ' in row]
