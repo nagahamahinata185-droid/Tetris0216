@@ -101,12 +101,18 @@ class Tetris:
                 if py < 0:
                     self.game_over = True
                     return
-                self.board[py][px] = self.kind
+                if self.kind == 'BOMB':
+                    self.board[py][px] = '@'
+                else:
+                    self.board[py][px] = self.kind
 
                 if self.kind == 'BOMB':
                     for by in range(py - 1, py + 2):
                         for bx in range(px - 1, px + 2):
                             if 0 <= by < ROWS and 0 <= bx < COLS:
+                                if bx == px and by == py:
+                                   continue
+                                
                                 self.board[by][bx] = ' '
 
             self.clear_lines()
